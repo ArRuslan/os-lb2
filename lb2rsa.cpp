@@ -82,7 +82,12 @@ uint32_t gen_prime() {
 }
 
 PQ gen_pq() {
-    return PQ{gen_prime(), gen_prime()};
+    uint32_t p = gen_prime(), q = gen_prime();
+    while(p == q) {
+        p = gen_prime();
+        q = gen_prime();
+    }
+    return PQ{p, q};
 }
 
 RSA::RSA() {

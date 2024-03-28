@@ -3,142 +3,36 @@
 #include <random>
 #include "lb2rsa.h"
 
-/*uint32_t randrange(uint32_t min, uint32_t max) {
-    std::random_device rd;
-    std::mt19937_64 eng(rd());
-    std::uniform_int_distribution<uint32_t> distr;
-
-    uint32_t range = max - min + 1;
-    return distr(eng) % range + min;
-}
-
-uint64_t modpow(uint64_t base, uint64_t exp, uint64_t mod) {
-    __int128 x = 1, y = base;
-    while (exp > 0) {
-        if (exp % 2 == 1) {
-            x = x * y % mod;
-        }
-        y = y * y % mod;
-        exp /= 2;
-    }
-    return x % mod;
-}
-
-bool areCoprime(uint64_t a, uint64_t b) {
-    while (b != 0) {
-        uint64_t temp = b;
-        b = a % b;
-        a = temp;
-    }
-    return a == 1;
-}
-
-uint32_t find_coprime(uint64_t m) {
-    long long coprime = 2;
-    while (!areCoprime(m, coprime)) {
-        coprime++;
-    }
-    return coprime;
-}
-
-uint64_t find_mod_inverse(int64_t a, int64_t m) {
-    int64_t oldR = a;
-    int64_t r = m;
-    int64_t oldS = 1;
-    int64_t s = 0;
-
-    while (r > 0) {
-        int64_t quot = oldR / r;
-
-        int64_t tempR = r;
-        r = oldR - quot * r;
-        oldR = tempR;
-
-        int64_t tempS = s;
-        s = oldS - quot * s;
-        oldS = tempS;
-    }
-
-    if (oldS < 0)
-        oldS += m;
-    return oldS;
-}
-
-bool isPrime(uint32_t n) {
-    if (n <= 1) return false;
-    if (n <= 3) return true;
-    if (n % 2 == 0 || n % 3 == 0) return false;
-    for (int i = 5; i * i <= n; i += 6) {
-        if (n % i == 0 || n % (i + 2) == 0) return false;
-    }
-    return true;
-}
-
-uint32_t gen_prime() {
-    while (true) {
-        uint32_t to_check = randrange(1 << 30, 1 << 31);
-        if (isPrime(to_check)) return to_check;
-    }
-}
-
-struct PQ {
-    uint32_t p;
-    uint32_t q;
-};
-
-struct PubKey {
-    uint32_t e;
-    uint64_t n;
-};
-
-struct PrivKey {
-    uint64_t d;
-    uint64_t n;
-};
-
-PQ gen_pq() {
-    return PQ{gen_prime(), gen_prime()};
-}
-
-class RSA {
-public:
-    RSA() {
-        PQ pq = gen_pq();
-        uint64_t N = (uint64_t) pq.p * pq.q;
-        uint64_t phi_N = (uint64_t) (pq.p - 1) * (pq.q - 1);
-        uint32_t e = find_coprime(phi_N);
-        pub_key.e = e;
-        priv_key.d = find_mod_inverse(e, phi_N);
-        pub_key.n = priv_key.n = N;
-    }
-
-    uint64_t encrypt(uint64_t data) {
-        return modpow(data, pub_key.e, pub_key.n);
-    }
-
-    uint64_t decrypt(uint64_t data) {
-        return modpow(data, priv_key.d, priv_key.n);
-    }
-
-private:
-    PubKey pub_key{};
-    PrivKey priv_key{};
-};*/
-
 int main() {
-    for(int i = 0; i < 10; i++) {
-        RSA* rsa = new RSA();
+    RSA* d0e0n0 = new RSA();
+    RSA* d1e1n1 = new RSA();
+    uint64_t ti = 123456789;
 
-        uint64_t input = 123456789;
-        uint64_t encrypted = rsa->encrypt(input);
-        uint64_t decrypted = rsa->decrypt(encrypted);
-
-        printf("Input: %ld\n", input);
-        printf("Encrypted: %ld\n", encrypted);
-        printf("Decrypted: %ld\n", decrypted);
-        printf("--------------------------\n");
-
-        delete rsa;
+    uint64_t e1t = d1e1n1->encrypt(ti);
+    uint64_t d1e1t = d1e1n1->decrypt(e1t);
+    if(d1e1t != ti) {
+        printf("Original value and decrypted do not match!\n");
+        return 1;
     }
+
+    printf("Input: %ld\n", ti);
+    printf("Encrypted: %ld\n", e1t);
+    printf("Decrypted: %ld\n", d1e1t);
+    printf("--------------------------\n");
+
+    uint64_t e0d1e1t = d0e0n0->encrypt(d1e1t);
+    uint64_t d0e0d1e1t = d0e0n0->decrypt(e0d1e1t);
+    if(d0e0d1e1t != d1e1t) {
+        printf("Original value and decrypted do not match!\n");
+        return 1;
+    }
+
+    printf("Input: %ld\n", d1e1t);
+    printf("Encrypted: %ld\n", e0d1e1t);
+    printf("Decrypted: %ld\n", d0e0d1e1t);
+    printf("--------------------------\n");
+
+    delete d0e0n0;
+    delete d1e1n1;
     return 0;
 }
