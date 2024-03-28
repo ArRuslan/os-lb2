@@ -1,9 +1,9 @@
-#include <cmath>
-#include <iostream>
-#include <random>
 #include "lb2rsa.h"
 
-/*uint32_t randrange(uint32_t min, uint32_t max) {
+#include <cmath>
+#include <random>
+
+uint32_t randrange(uint32_t min, uint32_t max) {
     std::random_device rd;
     std::mt19937_64 eng(rd());
     std::uniform_int_distribution<uint32_t> distr;
@@ -81,64 +81,22 @@ uint32_t gen_prime() {
     }
 }
 
-struct PQ {
-    uint32_t p;
-    uint32_t q;
-};
-
-struct PubKey {
-    uint32_t e;
-    uint64_t n;
-};
-
-struct PrivKey {
-    uint64_t d;
-    uint64_t n;
-};
-
 PQ gen_pq() {
     return PQ{gen_prime(), gen_prime()};
 }
 
-class RSA {
-public:
-    RSA() {
-        PQ pq = gen_pq();
-        uint64_t N = (uint64_t) pq.p * pq.q;
-        uint64_t phi_N = (uint64_t) (pq.p - 1) * (pq.q - 1);
-        uint32_t e = find_coprime(phi_N);
-        pub_key.e = e;
-        priv_key.d = find_mod_inverse(e, phi_N);
-        pub_key.n = priv_key.n = N;
-    }
+RSA::RSA() {
+    PQ pq = gen_pq();
+    uint64_t phi_N = (uint64_t) (pq.p - 1) * (pq.q - 1);
+    pub_key.e = find_coprime(phi_N);
+    priv_key.d = find_mod_inverse(pub_key.e, phi_N);
+    pub_key.n = priv_key.n = (uint64_t) pq.p * pq.q;
+}
 
-    uint64_t encrypt(uint64_t data) {
-        return modpow(data, pub_key.e, pub_key.n);
-    }
+uint64_t RSA::encrypt(uint64_t data) {
+    return modpow(data, pub_key.e, pub_key.n);
+}
 
-    uint64_t decrypt(uint64_t data) {
-        return modpow(data, priv_key.d, priv_key.n);
-    }
-
-private:
-    PubKey pub_key{};
-    PrivKey priv_key{};
-};*/
-
-int main() {
-    for(int i = 0; i < 10; i++) {
-        RSA* rsa = new RSA();
-
-        uint64_t input = 123456789;
-        uint64_t encrypted = rsa->encrypt(input);
-        uint64_t decrypted = rsa->decrypt(encrypted);
-
-        printf("Input: %ld\n", input);
-        printf("Encrypted: %ld\n", encrypted);
-        printf("Decrypted: %ld\n", decrypted);
-        printf("--------------------------\n");
-
-        delete rsa;
-    }
-    return 0;
+uint64_t RSA::decrypt(uint64_t data) {
+    return modpow(data, priv_key.d, priv_key.n);
 }
